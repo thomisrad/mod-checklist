@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSLU MOD Dashboard</title>
+<style>
+  :root{
+    --navy:#0f2436;
+    --slate:#3c4a58;
+    --accent:#c98a2c;
+    --good:#2f7d4f;
+    --bad:#b3402f;
+    --bg:#eef1f4;
+    --card:#ffffff;
+    --border:#d8dee4;
+    --text:#1c2733;
+    --muted:#6b7885;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  header{
+    background:var(--navy);
+    color:#fff;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .org-label{
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--accent);
+    font-weight:700;
+    margin-bottom:2px;
+  }
+  h1{ margin:0; font-size:19px; }
+  .subtitle{ font-size:12px; color:#b7c2cc; margin-top:2px;}
+  .nav-btn{
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    color:#fff;
+    font-size:12px;
+    padding:8px 14px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .nav-btn:hover{ background:rgba(255,255,255,0.16); }
+  main{
+    max-width:1000px;
+    margin:0 auto;
+    padding:20px 16px 60px;
+  }
+  .filters{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .filters select, .filters input{
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:8px 10px;
+    font-size:13px;
+    background:#fff;
+  }
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:12px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+  }
+  .stat-card .label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--muted);
+    font-weight:700;
+  }
+  .stat-card .value{
+    font-size:26px;
+    font-weight:700;
+    color:var(--navy);
+    margin-top:4px;
+  }
+  .stat-card .value.good{ color:var(--good); }
+  .stat-card .value.bad{ color:var(--bad); }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:16px;
+  }
+  .card h2{
+    font-size:14px;
+    margin:0 0 12px;
+    color:var(--navy);
+  }
+  .empty{
+    color:var(--muted);
+    font-size:13px;
+    text-align:center;
+    padding:24px 0;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--muted);
+    border-bottom:1px solid var(--border);
+    padding:6px 8px;
+  }
+  td{
+    padding:8px;
+    border-bottom:1px solid #eef1f4;
+    vertical-align:top;
+  }
+  tr:hover td{ background:#f7f9fa; }
+  .pct-pill{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:10px;
+    font-weight:700;
+    font-size:12px;
+  }
+  .pct-good{ background:#e3f2e8; color:var(--good); }
+  .pct-mid{ background:#fbf0dc; color:#8a5f16; }
+  .pct-bad{ background:#f7e2de; color:var(--bad); }
+  .view-link{
+    color:var(--navy);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:underline;
+  }
+  .offender-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:7px 0;
+    border-bottom:1px solid #eef1f4;
+    font-size:13px;
+  }
+  .offender-count{
+    background:#f7e2de;
+    color:var(--bad);
+    font-weight:700;
+    font-size:12px;
+    padding:2px 9px;
+    border-radius:10px;
+  }
+  .import-row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .import-row input[type=file]{ font-size:12px; }
+  .btn-small{
+    background:#f0f2f4;
+    border:1px solid var(--border);
+    color:var(--slate);
+    font-size:12px;
+    padding:7px 12px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .modal-backdrop{
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(15,36,54,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:16px;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal{
+    background:#fff;
+    border-radius:10px;
+    max-width:520px;
+    width:100%;
+    max-height:88vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .modal-head{
+    padding:14px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .modal-head h3{ margin:0; font-size:15px; color:var(--navy); }
+  .modal-head button{
+    background:none; border:none; font-size:20px; cursor:pointer; color:var(--muted);
+  }
+  .modal-body{ padding:16px 18px; overflow-y:auto; flex:1; }
+  .modal-body textarea{
+    width:100%; min-height:320px;
+    font-family:"SF Mono",Consolas,monospace;
+    font-size:12px; line-height:1.5;
+    border:1px solid var(--border); border-radius:6px;
+    padding:10px; background:#fafbfc; white-space:pre;
+  }
+  svg text{ font-family:inherit; }
+  .version-label{
+    position:fixed; bottom:2px; right:6px;
+    font-size:10px; color:#b9c2ca;
+  }
+  @media (max-width:700px){
+    .stat-grid{ grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="org-label">ONNI GROUP</div>
+    <h1>OSLU MOD Dashboard</h1>
+    <div class="subtitle">Shift completion history &amp; recurring issues</div>
+  </div>
+  <button class="nav-btn" onclick="window.location.href='mod-checklist.html'">Back to Checklist</button>
+</header>
+
+<main>
+  <div class="filters">
+    <select id="shiftFilter" onchange="renderAll()">
+      <option value="all">All shifts</option>
+      <option value="AM">AM only</option>
+      <option value="PM">PM only</option>
+    </select>
+    <select id="rangeFilter" onchange="renderAll()">
+      <option value="all">All time</option>
+      <option value="30">Last 30 days</option>
+      <option value="7">Last 7 days</option>
+    </select>
+    <div class="import-row">
+      <span>Import JSON:</span>
+      <input type="file" id="importFile" accept=".json" onchange="importHistory(this)">
+    </div>
+  </div>
+
+  <div class="stat-grid" id="statGrid"></div>
+
+  <div class="card">
+    <h2>Completion Rate Trend</h2>
+    <div id="chartWrap"></div>
+  </div>
+
+  <div class="card">
+    <h2>Most Frequently Flagged Items</h2>
+    <div id="offendersWrap"></div>
+  </div>
+
+  <div class="card">
+    <h2>Recent Shifts</h2>
+    <div id="tableWrap"></div>
+  </div>
+</main>
+
+<div class="modal-backdrop" id="reportModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Shift Report</h3>
+      <button onclick="document.getElementById('reportModal').classList.remove('open')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="reportText" readonly></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="version-label">v1 - offline</div>
+
+<script>
+var HISTORY_KEY = "oslu_mod_history";
+
+function getHistory(){
+  var raw = localStorage.getItem(HISTORY_KEY);
+  if(!raw) return [];
+  try{ return JSON.parse(raw); }catch(e){ return []; }
+}
+
+function setHistory(list){
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+}
+
+function filteredHistory(){
+  var shiftVal = document.getElementById("shiftFilter").value;
+  var rangeVal = document.getElementById("rangeFilter").value;
+  var history = getHistory();
+
+  if(shiftVal !== "all"){
+    history = history.filter(function(h){ return h.shift === shiftVal; });
+  }
+  if(rangeVal !== "all"){
+    var days = parseInt(rangeVal, 10);
+    var cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+    history = history.filter(function(h){ return new Date(h.savedAt).getTime() >= cutoff; });
+  }
+  return history.sort(function(a,b){ return new Date(a.savedAt) - new Date(b.savedAt); });
+}
+
+function pctClass(pct){
+  if(pct >= 90) return "pct-good";
+  if(pct >= 70) return "pct-mid";
+  return "pct-bad";
+}
+
+function renderStats(history){
+  var grid = document.getElementById("statGrid");
+  if(history.length === 0){
+    grid.innerHTML = "";
+    return;
+  }
+  var totalShifts = history.length;
+  var avgCompletion = Math.round(history.reduce(function(s,h){ return s + h.completionRate; }, 0) / totalShifts);
+  var totalFlagged = history.reduce(function(s,h){ return s + h.flaggedItems.length; }, 0);
+  var perfectShifts = history.filter(function(h){ return h.completionRate === 100; }).length;
+
+  var avgClass = avgCompletion >= 90 ? "good" : (avgCompletion >= 70 ? "" : "bad");
+
+  grid.innerHTML =
+    '<div class="stat-card"><div class="label">Shifts Logged</div><div class="value">' + totalShifts + '</div></div>' +
+    '<div class="stat-card"><div class="label">Avg Completion</div><div class="value ' + avgClass + '">' + avgCompletion + '%</div></div>' +
+    '<div class="stat-card"><div class="label">100% Shifts</div><div class="value good">' + perfectShifts + '</div></div>' +
+    '<div class="stat-card"><div class="label">Total Flagged Items</div><div class="value ' + (totalFlagged > 0 ? "bad" : "") + '">' + totalFlagged + '</div></div>';
+}
+
+function renderChart(history){
+  var wrap = document.getElementById("chartWrap");
+  if(history.length === 0){
+    wrap.innerHTML = "<p class='empty'>No shift data yet. Complete a shift report to see the trend here.</p>";
+    return;
+  }
+
+  var w = 900, h = 220, padL = 40, padR = 20, padT = 20, padB = 30;
+  var plotW = w - padL - padR;
+  var plotH = h - padT - padB;
+  var n = history.length;
+  var stepX = n > 1 ? plotW / (n - 1) : 0;
+
+  function xAt(i){ return padL + stepX * i; }
+  function yAt(pct){ return padT + plotH - (pct/100) * plotH; }
+
+  var points = history.map(function(h,i){ return xAt(i) + "," + yAt(h.completionRate); }).join(" ");
+
+  var gridLines = "";
+  [0,25,50,75,100].forEach(function(v){
+    var y = yAt(v);
+    gridLines += '<line x1="'+padL+'" y1="'+y+'" x2="'+(w-padR)+'" y2="'+y+'" stroke="#e3e7eb" stroke-width="1"/>';
+    gridLines += '<text x="4" y="'+(y+4)+'" font-size="10" fill="#6b7885">'+v+'%</text>';
+  });
+
+  var dots = history.map(function(h,i){
+    var cx = xAt(i), cy = yAt(h.completionRate);
+    var color = h.completionRate >= 90 ? "#2f7d4f" : (h.completionRate >= 70 ? "#c98a2c" : "#b3402f");
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="4" fill="'+color+'"><title>'+h.date+' '+h.shift+': '+h.completionRate+'%</title></circle>';
+  }).join("");
+
+  var labels = "";
+  if(n <= 14){
+    var labelY = h - padB + 24;
+    labels = history.map(function(rec,i){
+      return '<text x="'+xAt(i)+'" y="'+labelY+'" font-size="10" fill="#6b7885" text-anchor="middle">'+rec.date.slice(5)+'</text>';
+    }).join("");
+  }
+
+  var svg = '<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto;max-height:260px;">' +
+              gridLines +
+              '<polyline points="'+points+'" fill="none" stroke="#0f2436" stroke-width="2"/>' +
+              dots +
+              labels +
+            '</svg>';
+  wrap.innerHTML = svg;
+}
+
+function renderOffenders(history){
+  var wrap = document.getElementById("offendersWrap");
+  if(history.length === 0){
+    wrap.innerHTML = "<p class='empty'>No flagged items yet.</p>";
+    return;
+  }
+  var counts = {};
+  history.forEach(function(h){
+    h.flaggedItems.forEach(function(item){
+      counts[item] = (counts[item] || 0) + 1;
+    });
+  });
+  var sorted = Object.keys(counts).map(function(k){ return {label:k, count:counts[k]}; })
+    .sort(function(a,b){ return b.count - a.count; })
+    .slice(0, 10);
+
+  if(sorted.length === 0){
+    wrap.innerHTML = "<p class='empty'>No flagged items in this period. Nice work.</p>";
+    return;
+  }
+
+  wrap.innerHTML = sorted.map(function(item){
+    return '<div class="offender-row"><span>'+escapeHtml(item.label)+'</span><span class="offender-count">'+item.count+'x</span></div>';
+  }).join("");
+}
+
+function renderTable(history){
+  var wrap = document.getElementById("tableWrap");
+  var sorted = history.slice().sort(function(a,b){ return new Date(b.savedAt) - new Date(a.savedAt); });
+  if(sorted.length === 0){
+    wrap.innerHTML = "<p class='empty'>No shift reports saved yet. Reports generated in the checklist app will show up here automatically.</p>";
+    return;
+  }
+  var rows = sorted.map(function(h){
+    return '<tr>' +
+      '<td>'+escapeHtml(h.date)+'</td>' +
+      '<td>'+escapeHtml(h.shift)+'</td>' +
+      '<td>'+escapeHtml(h.supervisor)+'</td>' +
+      '<td><span class="pct-pill '+pctClass(h.completionRate)+'">'+h.completionRate+'%</span></td>' +
+      '<td>'+h.flaggedItems.length+'</td>' +
+      '<td><span class="view-link" onclick="viewReport('+h.id+')">View</span></td>' +
+      '</tr>';
+  }).join("");
+
+  wrap.innerHTML = '<table><thead><tr><th>Date</th><th>Shift</th><th>Supervisor</th><th>Completion</th><th>Flagged</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function viewReport(id){
+  var history = getHistory();
+  var entry = history.find(function(h){ return h.id === id; });
+  if(!entry) return;
+  document.getElementById("reportText").value = entry.reportText || "(no report text saved)";
+  document.getElementById("reportModal").classList.add("open");
+}
+
+function escapeHtml(str){
+  var div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function importHistory(input){
+  var file = input.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var imported = JSON.parse(e.target.result);
+      if(!Array.isArray(imported)) throw new Error("not an array");
+      var existing = getHistory();
+      var existingIds = existing.map(function(h){ return h.id; });
+      var merged = existing.concat(imported.filter(function(h){ return existingIds.indexOf(h.id) === -1; }));
+      setHistory(merged);
+      renderAll();
+      alert("Imported " + imported.length + " shift record(s).");
+    }catch(err){
+      alert("Could not read that file as shift history JSON.");
+    }
+  };
+  reader.readAsText(file);
+  input.value = "";
+}
+
+function renderAll(){
+  var history = filteredHistory();
+  renderStats(history);
+  renderChart(history);
+  renderOffenders(history);
+  renderTable(history);
+}
+
+renderAll();
+</script>
+
+</body>
+</html>

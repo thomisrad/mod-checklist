@@ -1,0 +1,86 @@
+{
+  "orgLabel": "ONNI GROUP",
+  "title": "OSLU Manager on Duty Checklist",
+  "subtitle": "AM & PM Shift Supervisors | Amenity & Building Management",
+  "purpose": "The assigned Manager on Duty is responsible for ensuring all staff are in place and that the building is functioning as designed. The primary purpose of this role is to deliver A-class service at all hours of the day. This is achieved by continuously walking the building, proactively identifying action items, and implementing immediate resolutions. The MOD does not wait - every issue found is an issue resolved before the next step is taken.",
+  "walkIntervalMinutes": 90,
+  "sections": [
+    {
+      "id": "amenity_walk",
+      "number": 1,
+      "title": "Amenity Walk - Required Every 90 Minutes",
+      "hasWalkLog": true,
+      "items": [
+        { "id": "aw_areas", "label": "Walk conducted through ALL amenity areas" },
+        { "id": "aw_logged", "label": "Walk time logged on shift record" },
+        { "id": "aw_identified", "label": "Action items identified during walk" },
+        { "id": "aw_resolved", "label": "ALL action items resolved immediately" },
+        { "id": "aw_escalated", "label": "Items needing follow-up - escalated to Property Manager" },
+        { "id": "aw_watch", "label": "Items to watch - communicated to next shift supervisor" }
+      ]
+    },
+    {
+      "id": "gym",
+      "number": 2,
+      "title": "Gym & Fitness Center",
+      "items": [
+        { "id": "gym_clean", "label": "Gym is clean and free of trash/debris" },
+        { "id": "gym_equipment", "label": "All gym equipment is operational (no out-of-order)" },
+        { "id": "gym_towels_stocked", "label": "Gym towels stocked at dispensers" },
+        { "id": "gym_towels_cleared", "label": "Used/soiled gym towels cleared and removed" },
+        { "id": "gym_mirrors", "label": "Mirrors clean, no visible damage to walls/fixtures" },
+        { "id": "gym_furniture", "label": "Furniture and equipment properly arranged" },
+        { "id": "gym_av", "label": "TVs and music operating at appropriate levels" },
+        { "id": "gym_unauthorized", "label": "Unauthorized users identified and removed" }
+      ]
+    },
+    {
+      "id": "pool",
+      "number": 3,
+      "title": "Pool & Pool Deck",
+      "items": [
+        { "id": "pool_water", "label": "Pool water is clean, clear, and inviting" },
+        { "id": "pool_deck_trash", "label": "Pool deck is free of all trash and debris" },
+        { "id": "pool_towels_stocked", "label": "Pool towels stocked at dispensers" },
+        { "id": "pool_towels_cleared", "label": "Used/soiled pool towels cleared and removed" },
+        { "id": "pool_furniture", "label": "Pool deck furniture properly arranged" },
+        { "id": "pool_furniture_damage", "label": "No damaged furniture or equipment on deck" },
+        { "id": "pool_unauthorized", "label": "Pool area free of unauthorized users" },
+        { "id": "pool_unruly", "label": "Unruly residents/guests addressed per policy" },
+        { "id": "pool_signage", "label": "Pool signage visible and in good condition" },
+        { "id": "pool_equipment", "label": "Pool equipment (pumps, heaters, lights) operational" }
+      ]
+    },
+    {
+      "id": "lounges",
+      "number": 4,
+      "title": "Lounges, Common Areas & Other Amenities",
+      "items": [
+        { "id": "lounge_clean", "label": "All lounge areas clean and professionally presented" },
+        { "id": "lounge_furniture", "label": "Furniture arranged per property layout standard" },
+        { "id": "lounge_surfaces", "label": "No trash, debris, or stains on surfaces/floors" },
+        { "id": "lounge_av", "label": "TVs and music operating correctly" },
+        { "id": "lounge_lighting", "label": "Lighting functional and at correct level" },
+        { "id": "lounge_damage", "label": "Areas free of damage (walls, floors, fixtures)" },
+        { "id": "lounge_corridors", "label": "Elevators and corridors inspected and clean" },
+        { "id": "lounge_equipment", "label": "Amenity equipment (BBQ, billiards, etc.) operational" },
+        { "id": "lounge_unauthorized", "label": "Unauthorized users identified and removed" },
+        { "id": "lounge_unruly", "label": "Unruly residents/guests addressed immediately" }
+      ]
+    },
+    {
+      "id": "escalation",
+      "number": 5,
+      "title": "Escalation Protocol & Shift Handoff",
+      "items": [
+        { "id": "esc_actioned", "label": "All findings actioned immediately upon discovery" },
+        { "id": "esc_workorders", "label": "Maintenance work orders submitted for equipment issues" },
+        { "id": "esc_pm_notified", "label": "Property Manager notified of items requiring attention" },
+        { "id": "esc_briefed", "label": "Next shift supervisor briefed on all items to watch" },
+        { "id": "esc_incident", "label": "Incident reports completed (if applicable)" },
+        { "id": "esc_log", "label": "Shift log fully updated before end of shift" }
+      ]
+    }
+  ],
+  "footerNote": "ALL FINDINGS MUST BE HANDLED IMMEDIATELY - Escalate to Property Manager as needed - Document findings and hand off to next shift supervisor"
+}
