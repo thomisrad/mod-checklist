@@ -222,10 +222,9 @@
   <div class="subtitle" id="appSubtitle">AM &amp; PM Shift Supervisors | Amenity &amp; Building Management</div>
   <div class="nav-row">
     <button class="nav-btn" onclick="openHistoryModal()">Shift History</button>
-    <button class="nav-btn" onclick="window.location.href='mod-dashboard.html'">Dashboard</button>
     <button class="nav-btn" onclick="resetForm(true)">New Shift</button>
   </div>
-  <div class="sync-badge syncing" id="syncBadge" onclick="openSyncModal()">
+  <div class="sync-badge syncing" id="syncBadge" onclick="showSyncStatus()">
     <span class="dot"></span><span id="syncBadgeText">Checking sync...</span>
   </div>
 </header>
@@ -307,34 +306,35 @@
   </div>
 </div>
 
-<div class="modal-backdrop" id="syncModal">
+<div class="modal-backdrop" id="welcomeModal">
   <div class="modal">
     <div class="modal-head">
-      <h3>GitHub Sync</h3>
-      <button onclick="closeModal('syncModal')">&times;</button>
+      <h3>Welcome</h3>
     </div>
     <div class="modal-body">
-      <div class="status-line" id="syncModalStatus"></div>
-      <p>
-        Shift reports are shared across every device through a JSON file stored on the
-        <code id="syncRepoLabel">GitHub repo</code>'s <code>data</code> branch.
-        Enter a GitHub Personal Access Token (fine-grained, scoped to just this repo with
-        <strong>Contents: Read and write</strong> permission) to enable saving from this device.
-        The token stays only in this browser - it is never written into any file.
-      </p>
-      <p style="margin-top:-6px;">Reading shared history and the dashboard do not require a token.</p>
-      <label style="font-size:11px;font-weight:700;color:#6b7885;text-transform:uppercase;letter-spacing:0.5px;">Personal Access Token</label>
-      <input type="password" id="tokenInput" placeholder="github_pat_...">
+      <p>Before your first shift report, let's get this device set up. Your name and token are saved to this device permanently and won't need to be entered again.</p>
+      <div class="shift-grid" style="margin-bottom:14px;">
+        <div class="field">
+          <label>First Name</label>
+          <input type="text" id="welcomeFirst" placeholder="First name">
+        </div>
+        <div class="field">
+          <label>Last Name</label>
+          <input type="text" id="welcomeLast" placeholder="Last name">
+        </div>
+      </div>
+      <label style="font-size:11px;font-weight:700;color:#6b7885;text-transform:uppercase;letter-spacing:0.5px;">GitHub Personal Access Token</label>
+      <input type="password" id="welcomeToken" placeholder="github_pat_...">
+      <p style="margin-top:10px;">Your name auto-fills the Supervisor field on every shift report from this device. The token lets shift reports from this device sync to every other device.</p>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-secondary" onclick="clearTokenAndClose()">Clear Token</button>
-      <button class="btn btn-primary" onclick="saveTokenAndClose()">Save &amp; Connect</button>
+      <button class="btn btn-primary" style="flex:1;" onclick="submitWelcome()">Get Started</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="version-label">v2 - github sync</div>
+<div class="version-label">v3 - named + synced</div>
 
 <script>
 // ---------- Default config (fallback if mod-config.json cannot be fetched) ----------
@@ -416,6 +416,7 @@ var GH_API = "https://api.github.com/repos/" + GH_OWNER + "/" + GH_REPO + "/cont
 var TOKEN_KEY = "mod_gh_token";
 var PENDING_KEY = "mod_pending_sync";
 var DRAFT_KEY = "oslu_mod_draft";
+var NAME_KEY = "mod_user_name";
 
 var CONFIG = null;
 var currentShift = null;
@@ -442,11 +443,11 @@ function init(){
   document.getElementById("purposeBox").textContent = CONFIG.purpose;
   document.getElementById("footerNote").textContent = CONFIG.footerNote;
   document.getElementById("shiftDate").value = todayStr();
-  document.getElementById("syncRepoLabel").textContent = GH_OWNER + "/" + GH_REPO;
 
   renderSections();
   loadDraft();
   updateProgress();
+  checkFirstRun();
   retrySync(false);
 }
 
@@ -709,6 +710,51 @@ function getToken(){ return localStorage.getItem(TOKEN_KEY) || ""; }
 function setTokenValue(t){ localStorage.setItem(TOKEN_KEY, t); }
 function clearTokenValue(){ localStorage.removeItem(TOKEN_KEY); }
 
+// ---------- Name storage (device-local only) ----------
+function getUserName(){
+  try{ return JSON.parse(localStorage.getItem(NAME_KEY) || "null"); }catch(e){ return null; }
+}
+function setUserName(first, last){
+  localStorage.setItem(NAME_KEY, JSON.stringify({ first:first, last:last }));
+}
+function fullName(){
+  var n = getUserName();
+  return n ? (n.first + " " + n.last).trim() : "";
+}
+
+function prefillSupervisorFromName(){
+  var el = document.getElementById("supervisorName");
+  if(el && !el.value){
+    el.value = fullName();
+  }
+}
+
+function checkFirstRun(){
+  if(!getUserName()){
+    openModal("welcomeModal");
+  } else {
+    prefillSupervisorFromName();
+  }
+}
+
+function submitWelcome(){
+  var first = document.getElementById("welcomeFirst").value.trim();
+  var last = document.getElementById("welcomeLast").value.trim();
+  var token = document.getElementById("welcomeToken").value.trim();
+  if(!first || !last){
+    showToast("Please enter both first and last name");
+    return;
+  }
+  setUserName(first, last);
+  if(token){
+    setTokenValue(token);
+  }
+  prefillSupervisorFromName();
+  closeModal("welcomeModal");
+  showToast("Saved - welcome, " + first + "!");
+  retrySync(false);
+}
+
 // ---------- Pending queue (entries not yet confirmed on GitHub) ----------
 function getPending(){
   try{ return JSON.parse(localStorage.getItem(PENDING_KEY) || "[]"); }catch(e){ return []; }
@@ -833,34 +879,11 @@ function setSyncBadge(state, text){
   var badge = document.getElementById("syncBadge");
   badge.className = "sync-badge " + state;
   document.getElementById("syncBadgeText").textContent = text;
-  var modalStatus = document.getElementById("syncModalStatus");
-  if(modalStatus){
-    modalStatus.className = "status-line " + state;
-    modalStatus.textContent = text;
-  }
 }
 
-function openSyncModal(){
-  document.getElementById("tokenInput").value = getToken();
-  openModal("syncModal");
-}
-
-function saveTokenAndClose(){
-  var val = document.getElementById("tokenInput").value.trim();
-  if(val){
-    setTokenValue(val);
-    showToast("Token saved to this device");
-  }
-  closeModal("syncModal");
-  retrySync(false);
-}
-
-function clearTokenAndClose(){
-  clearTokenValue();
-  document.getElementById("tokenInput").value = "";
-  showToast("Token cleared from this device");
-  setSyncBadge("warn", "No token set - saving will be device-only");
-  closeModal("syncModal");
+function showSyncStatus(){
+  var text = document.getElementById("syncBadgeText").textContent;
+  showToast(text);
 }
 
 function copyReport(){
@@ -934,6 +957,7 @@ function resetForm(confirmFirst){
   document.getElementById("shiftDate").value = todayStr();
   renderSections();
   updateProgress();
+  prefillSupervisorFromName();
   showToast("New shift started");
 }
 
