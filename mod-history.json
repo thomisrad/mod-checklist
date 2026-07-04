@@ -1,0 +1,252 @@
+[
+  {
+    "date": "2026-07-04",
+    "shift": "PM",
+    "supervisor": "Tom Torres",
+    "sections": [
+      {
+        "id": "amenity_walk",
+        "title": "Amenity Walk - Required Every 90 Minutes",
+        "items": [
+          {
+            "id": "aw_areas",
+            "label": "Walk conducted through ALL amenity areas",
+            "checked": true
+          },
+          {
+            "id": "aw_logged",
+            "label": "Walk time logged on shift record",
+            "checked": true
+          },
+          {
+            "id": "aw_identified",
+            "label": "Action items identified during walk",
+            "checked": true
+          },
+          {
+            "id": "aw_resolved",
+            "label": "ALL action items resolved immediately",
+            "checked": true
+          },
+          {
+            "id": "aw_escalated",
+            "label": "Items needing follow-up - escalated to Property Manager",
+            "checked": true
+          },
+          {
+            "id": "aw_watch",
+            "label": "Items to watch - communicated to next shift supervisor",
+            "checked": true
+          }
+        ],
+        "notes": "Test",
+        "walkLogs": []
+      },
+      {
+        "id": "gym",
+        "title": "Gym & Fitness Center",
+        "items": [
+          {
+            "id": "gym_clean",
+            "label": "Gym is clean and free of trash/debris",
+            "checked": true
+          },
+          {
+            "id": "gym_equipment",
+            "label": "All gym equipment is operational (no out-of-order)",
+            "checked": true
+          },
+          {
+            "id": "gym_towels_stocked",
+            "label": "Gym towels stocked at dispensers",
+            "checked": true
+          },
+          {
+            "id": "gym_towels_cleared",
+            "label": "Used/soiled gym towels cleared and removed",
+            "checked": true
+          },
+          {
+            "id": "gym_mirrors",
+            "label": "Mirrors clean, no visible damage to walls/fixtures",
+            "checked": true
+          },
+          {
+            "id": "gym_furniture",
+            "label": "Furniture and equipment properly arranged",
+            "checked": true
+          },
+          {
+            "id": "gym_av",
+            "label": "TVs and music operating at appropriate levels",
+            "checked": true
+          },
+          {
+            "id": "gym_unauthorized",
+            "label": "Unauthorized users identified and removed",
+            "checked": true
+          }
+        ],
+        "notes": "Test"
+      },
+      {
+        "id": "pool",
+        "title": "Pool & Pool Deck",
+        "items": [
+          {
+            "id": "pool_water",
+            "label": "Pool water is clean, clear, and inviting",
+            "checked": true
+          },
+          {
+            "id": "pool_deck_trash",
+            "label": "Pool deck is free of all trash and debris",
+            "checked": true
+          },
+          {
+            "id": "pool_towels_stocked",
+            "label": "Pool towels stocked at dispensers",
+            "checked": true
+          },
+          {
+            "id": "pool_towels_cleared",
+            "label": "Used/soiled pool towels cleared and removed",
+            "checked": true
+          },
+          {
+            "id": "pool_furniture",
+            "label": "Pool deck furniture properly arranged",
+            "checked": true
+          },
+          {
+            "id": "pool_furniture_damage",
+            "label": "No damaged furniture or equipment on deck",
+            "checked": true
+          },
+          {
+            "id": "pool_unauthorized",
+            "label": "Pool area free of unauthorized users",
+            "checked": true
+          },
+          {
+            "id": "pool_unruly",
+            "label": "Unruly residents/guests addressed per policy",
+            "checked": true
+          },
+          {
+            "id": "pool_signage",
+            "label": "Pool signage visible and in good condition",
+            "checked": true
+          },
+          {
+            "id": "pool_equipment",
+            "label": "Pool equipment (pumps, heaters, lights) operational",
+            "checked": true
+          }
+        ],
+        "notes": ""
+      },
+      {
+        "id": "lounges",
+        "title": "Lounges, Common Areas & Other Amenities",
+        "items": [
+          {
+            "id": "lounge_clean",
+            "label": "All lounge areas clean and professionally presented",
+            "checked": true
+          },
+          {
+            "id": "lounge_furniture",
+            "label": "Furniture arranged per property layout standard",
+            "checked": true
+          },
+          {
+            "id": "lounge_surfaces",
+            "label": "No trash, debris, or stains on surfaces/floors",
+            "checked": true
+          },
+          {
+            "id": "lounge_av",
+            "label": "TVs and music operating correctly",
+            "checked": true
+          },
+          {
+            "id": "lounge_lighting",
+            "label": "Lighting functional and at correct level",
+            "checked": true
+          },
+          {
+            "id": "lounge_damage",
+            "label": "Areas free of damage (walls, floors, fixtures)",
+            "checked": true
+          },
+          {
+            "id": "lounge_corridors",
+            "label": "Elevators and corridors inspected and clean",
+            "checked": true
+          },
+          {
+            "id": "lounge_equipment",
+            "label": "Amenity equipment (BBQ, billiards, etc.) operational",
+            "checked": true
+          },
+          {
+            "id": "lounge_unauthorized",
+            "label": "Unauthorized users identified and removed",
+            "checked": true
+          },
+          {
+            "id": "lounge_unruly",
+            "label": "Unruly residents/guests addressed immediately",
+            "checked": true
+          }
+        ],
+        "notes": "Test"
+      },
+      {
+        "id": "escalation",
+        "title": "Escalation Protocol & Shift Handoff",
+        "items": [
+          {
+            "id": "esc_actioned",
+            "label": "All findings actioned immediately upon discovery",
+            "checked": true
+          },
+          {
+            "id": "esc_workorders",
+            "label": "Maintenance work orders submitted for equipment issues",
+            "checked": true
+          },
+          {
+            "id": "esc_pm_notified",
+            "label": "Property Manager notified of items requiring attention",
+            "checked": true
+          },
+          {
+            "id": "esc_briefed",
+            "label": "Next shift supervisor briefed on all items to watch",
+            "checked": true
+          },
+          {
+            "id": "esc_incident",
+            "label": "Incident reports completed (if applicable)",
+            "checked": true
+          },
+          {
+            "id": "esc_log",
+            "label": "Shift log fully updated before end of shift",
+            "checked": true
+          }
+        ],
+        "notes": "Testing!"
+      }
+    ],
+    "totalItems": 40,
+    "checkedItems": 40,
+    "completionRate": 100,
+    "flaggedItems": [],
+    "id": 1783198947961,
+    "savedAt": "2026-07-04T21:02:27.961Z",
+    "reportText": "OSLU MOD SHIFT REPORT\n2026-07-04 | PM | Tom Torres\nCompletion: 40/40 (100%)\n\nNOTES:\nAmenity Walk - Required Every 90 Minutes: Test\nGym & Fitness Center: Test\nLounges, Common Areas & Other Amenities: Test\nEscalation Protocol & Shift Handoff: Testing!"
+  }
+]
