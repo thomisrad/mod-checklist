@@ -203,7 +203,8 @@
     z-index:60; opacity:0; transition:opacity 0.25s ease; pointer-events:none;
   }
   .toast.show{ opacity:1; }
-  .version-label{ position:fixed; bottom:2px; right:6px; font-size:10px; color:#b9c2ca; z-index:1; }
+  .version-label{ font-size:10px; color:#7c8892; margin-top:8px; }
+  .locked-field{ background:#eef1f4 !important; color:var(--muted) !important; cursor:not-allowed; }
   .pending-flag{
     display:inline-block; background:#fbf0dc; color:var(--warn); font-size:11px;
     font-weight:700; padding:2px 8px; border-radius:10px; margin-left:6px;
@@ -227,6 +228,7 @@
   <div class="sync-badge syncing" id="syncBadge" onclick="showSyncStatus()">
     <span class="dot"></span><span id="syncBadgeText">Checking sync...</span>
   </div>
+  <div class="version-label">v5 - updated Jul 4, 2026</div>
 </header>
 
 <main>
@@ -312,7 +314,7 @@
       <h3>Welcome</h3>
     </div>
     <div class="modal-body">
-      <p>Before your first shift report, let's get this device set up. Your name and token are saved to this device permanently and won't need to be entered again.</p>
+      <p id="welcomeIntro">Before your first shift report, let's get this device set up. Your name and token are saved to this device permanently and won't need to be entered again.</p>
       <div class="shift-grid" style="margin-bottom:14px;">
         <div class="field">
           <label>First Name</label>
@@ -334,7 +336,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="version-label">v3 - named + synced</div>
 
 <script>
 // ---------- Default config (fallback if mod-config.json cannot be fetched) ----------
@@ -682,6 +683,9 @@ async function saveToHistory(){
   } else if(result.reason === "no-token"){
     addPending(entry);
     showToast("Saved to this device only - no GitHub token set on this device");
+  } else if(result.reason === "auth"){
+    addPending(entry);
+    showToast("Saved locally - this device's token is no longer valid, please re-connect");
   } else {
     addPending(entry);
     showToast("Could not reach GitHub - saved on this device, will retry automatically");
@@ -719,17 +723,44 @@ function fullName(){
 
 function prefillSupervisorFromName(){
   var el = document.getElementById("supervisorName");
-  if(el && !el.value){
-    el.value = fullName();
+  var name = fullName();
+  if(el && name){
+    el.value = name;
+    el.readOnly = true;
+    el.classList.add("locked-field");
+  }
+}
+
+function unlockSupervisorField(){
+  var el = document.getElementById("supervisorName");
+  if(el){
+    el.readOnly = false;
+    el.classList.remove("locked-field");
   }
 }
 
 function checkFirstRun(){
   if(!getUserName()){
+    document.getElementById("welcomeIntro").textContent =
+      "Before your first shift report, let's get this device set up. Your name and token are saved to this device permanently and won't need to be entered again.";
     openModal("welcomeModal");
   } else {
     prefillSupervisorFromName();
   }
+}
+
+function triggerReauth(reason){
+  clearTokenValue();
+  localStorage.removeItem(NAME_KEY);
+  unlockSupervisorField();
+  document.getElementById("welcomeFirst").value = "";
+  document.getElementById("welcomeLast").value = "";
+  document.getElementById("welcomeToken").value = "";
+  document.getElementById("welcomeIntro").textContent =
+    "Your saved GitHub token no longer works" + (reason ? " (" + reason + ")" : "") +
+    ". Please re-enter your name and a new token to continue.";
+  setSyncBadge("warn", "Token invalid - re-connect required");
+  openModal("welcomeModal");
 }
 
 function submitWelcome(){
@@ -743,6 +774,7 @@ function submitWelcome(){
   setUserName(first, last);
   if(token){
     setTokenValue(token);
+    authFailed = false;
   }
   prefillSupervisorFromName();
   closeModal("welcomeModal");
@@ -788,10 +820,17 @@ function ghFetch(method, body){
   return fetch(url, opts).finally(function(){ clearTimeout(timeoutId); });
 }
 
+var authFailed = false;
+
 async function ghLoadHistory(){
   setSyncBadge("syncing", "Checking GitHub...");
   try{
     var res = await ghFetch("GET");
+    if(res.status === 401){
+      authFailed = true;
+      triggerReauth("token may have been revoked or regenerated");
+      return null;
+    }
     if(res.status === 404){
       remoteHistory = [];
       remoteSha = null;
@@ -799,6 +838,7 @@ async function ghLoadHistory(){
       return remoteHistory;
     }
     if(!res.ok) throw new Error("HTTP " + res.status);
+    authFailed = false;
     var data = await res.json();
     remoteSha = data.sha;
     remoteHistory = JSON.parse(b64DecodeUtf8(data.content));
@@ -817,6 +857,7 @@ async function ghSaveEntry(entry){
   setSyncBadge("syncing", "Saving...");
   try{
     await ghLoadHistory();
+    if(authFailed) return { ok:false, reason:"auth" };
     var history = remoteHistory || [];
 
     var isDup = history.some(function(h){
@@ -837,6 +878,11 @@ async function ghSaveEntry(entry){
     if(remoteSha) body.sha = remoteSha;
 
     var res = await ghFetch("PUT", body);
+    if(res.status === 401){
+      authFailed = true;
+      triggerReauth("token may have been revoked or regenerated");
+      return { ok:false, reason:"auth" };
+    }
     if(!res.ok){
       throw new Error("HTTP " + res.status);
     }
